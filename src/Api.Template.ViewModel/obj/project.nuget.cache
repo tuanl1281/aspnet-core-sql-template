@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "q84n+XVrISFG2JcG5TBAfsl/FyXdOjpwAx+S0GT+SlDkiMjHhRHripMaHFW/iRrroeMzpVEeO8+Kg8ra2WjDPw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\d3sktop\\Desktop\\Projects\\aspnet-core-template\\src\\Api.Template.ViewModel\\Api.Template.ViewModel.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\d3sktop\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
