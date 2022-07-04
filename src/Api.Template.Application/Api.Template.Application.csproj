@@ -37,7 +37,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Api.Template.Data\Api.Template.Data.csproj" />
+      <ProjectReference Include="..\Api.Template.Service\Api.Template.Service.csproj" />
       <ProjectReference Include="..\Api.Template.ViewModel\Api.Template.ViewModel.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers" />
     </ItemGroup>
 
 </Project>

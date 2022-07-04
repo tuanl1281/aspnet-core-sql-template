@@ -7,15 +7,20 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="11.0.1" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Core" />
       <Folder Include="ExportServices" />
       <Folder Include="ImportServices" />
       <Folder Include="MappingProfiles" />
       <Folder Include="Utilities" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Api.Template.Data\Api.Template.Data.csproj" />
+      <ProjectReference Include="..\Api.Template.ViewModel\Api.Template.ViewModel.csproj" />
     </ItemGroup>
 
 </Project>

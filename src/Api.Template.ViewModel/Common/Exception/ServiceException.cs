@@ -1,16 +1,15 @@
 ﻿namespace Api.Template.ViewModel.Common.Exception;
 
-using System;
-using System.Globalization;
-
-public class ServiceException: Exception
+public class ServiceException: System.Exception
 {
+    public dynamic Errors { get; set; }
+        
     public ServiceException() : base() { }
 
     public ServiceException(string message) : base(message) { }
 
-    public ServiceException(string message, params object[] args)
-        : base(string.Format(CultureInfo.CurrentCulture, message, args))
+    public ServiceException(string message, dynamic errors) : base(message)
     {
+        Errors = errors;
     }
 }

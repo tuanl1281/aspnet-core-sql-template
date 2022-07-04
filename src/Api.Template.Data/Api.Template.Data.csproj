@@ -13,10 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Configurations" />
-      <Folder Include="Constants" />
-      <Folder Include="Entities" />
-      <Folder Include="Enums" />
       <Folder Include="Migrations" />
     </ItemGroup>
 

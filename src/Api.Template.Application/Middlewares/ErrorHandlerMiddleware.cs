@@ -1,19 +1,19 @@
-﻿namespace Api.Template.Application.Middlewares;
-
-using Serilog;
+﻿using Serilog;
 using System.Net;
 using Microsoft.AspNetCore.Http;
-using ViewModel.Common;
-using ViewModel.Common.Exception;
+using Api.Template.ViewModel.Common.Exception;
+using Api.Template.ViewModel.Common.Response;
+
+namespace Api.Template.Application.Middlewares;
 
 public class ErrorHandlerMiddleware
 {
     private readonly RequestDelegate _next;
 
-    public ErrorHandlerMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+	public ErrorHandlerMiddleware(RequestDelegate next)
+	{
+		_next = next;
+	}
 
     public async Task InvokeAsync(HttpContext httpContext)
     {
@@ -29,50 +29,55 @@ public class ErrorHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        object result;
-        string errorMessages;
+        object result; string messages;
+        
         switch (exception)
         {
             case ServiceException _exception:
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                errorMessages = _exception.Message;
-                result = new ResultModel()
                 {
-                    Succeed = false,
-                    ErrorMessages = errorMessages,
-                };
+                    context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                    if (_exception.Errors != null)
+                    {
+                        result = new ErrorResponseModel()
+                        {
+                            Succeed = false,
+                            Errors = _exception.Errors,
+                            Message = _exception.Message,
+                        };
 
-                break;
-            }
+                        break;
+                    }
+                    
+                    result = new ResultResponseModel()
+                    {
+                        Succeed = false,
+                        Message = _exception.Message,
+                    };
+
+                    break;
+                }
             case NotFoundException _exception:
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                errorMessages = _exception.Message;
-                result = new ResultModel()
                 {
-                    Succeed = false,
-                    ErrorMessages = errorMessages,
-                };
+                    context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                    messages = _exception.Message;
+                    result = new ResultResponseModel()
+                    {
+                        Succeed = false,
+                        Message = messages,
+                    };
 
-                Log.Error(errorMessages);
-                break;
-            }
+                    Log.Error(messages);
+                    break;
+                }
             default:
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                errorMessages = exception.Message + "\n" +
-                                (exception.InnerException != null ? exception.InnerException.Message : "") +
-                                "\n ***Trace*** \n" + exception.StackTrace;
-                result = new ResultModel()
                 {
-                    Succeed = false,
-                    ErrorMessages = errorMessages,
-                };
-
-                Log.Error(errorMessages);
-                break;
-            }
+                    context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                    messages = exception.Message + "\n" + (exception.InnerException != null ? exception.InnerException.Message : "") + "\n ***Trace*** \n" + exception.StackTrace;
+                    result = messages;
+                    
+                    Log.Error(messages);
+                    break;
+                }
         }
 
         context.Response.ContentType = "application/json";

@@ -37,7 +37,7 @@ public class Startup
     
     public void ConfigureServices(IServiceCollection services)
     {
-        #region Hangfire
+        #region --- Hangfire ---
         if (Environment.IsDevelopment())
         {
             services.AddHangfire(configuration =>
@@ -69,7 +69,7 @@ public class Startup
         services.AddHangfireServer();
         #endregion
 
-        #region Versioning
+        #region --- Versioning ---
         services.AddApiVersioning(_ =>
         {
             _.DefaultApiVersion = new ApiVersion(1, 0);
@@ -94,7 +94,7 @@ public class Startup
         /* For JWT */
         services.AddJwt(Configuration["Jwt:Key"], Configuration["Jwt:Issuer"], Configuration["Jwt:Issuer"]);
         /* For Swagger */
-        services.AddSwagger(Environment);
+        services.AddSwagger(Environment, Configuration);
         /* For mapping */
         services.AddMappingProfile();
         /* For Layer Pattern */
@@ -134,7 +134,7 @@ public class Startup
                     if (_.Context.Request.Path.StartsWithSegments("/files"))
                     {
                         _.Context.Response.Headers.Add("Cache-Control", "no-store");
-                        if (!_.Context.User.Identity.IsAuthenticated)
+                        if (_.Context.User.Identity is { IsAuthenticated: false })
                         {
                             _.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                             _.Context.Response.ContentLength = 0;
