@@ -1,4 +1,6 @@
-﻿namespace Api.Template.Data.Repositories.Common;
+﻿using Api.Template.Data.Entities.Common;
+
+namespace Api.Template.Data.Repositories.Common;
 
 using System;
 using System.Linq;
@@ -58,11 +60,17 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     void Update(T entity);
 
     /// <summary>
+    /// Delete an entity
+    /// </summary>
+    /// <param name="entity"></param>
+    void Delete(T entity);
+
+    /// <summary>
     /// Delete an entity by id
     /// </summary>
     /// <param name="id"></param>
     void Delete(object id);
-
+    
     /// <summary>
     /// Delete by expression
     /// </summary>
@@ -220,13 +228,42 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     }
 
     /// <summary>
+    /// Delete an entity
+    /// </summary>
+    /// <param name="entity"></param>
+    public virtual void Delete(T entity)
+    {
+        var existing = _dbSet.Find(entity);
+        if (existing == null)
+            return;
+        
+        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+        {
+            (existing as SoftDeletedBaseEntity)!.IsDeleted = true;
+            _dbSet.Attach(existing);
+            _dbContext.Entry(existing).State = EntityState.Modified;
+        }
+        else
+            _dbSet.Remove(existing);
+    }
+    
+    /// <summary>
     /// Delete an entity by id
     /// </summary>
     /// <param name="id"></param>
     public virtual void Delete(object id)
     {
-        T? existing = _dbSet.Find(id);
-        if (existing != null)
+        var existing = _dbSet.Find(id);
+        if (existing == null)
+            return;
+        
+        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+        {
+            (existing as SoftDeletedBaseEntity)!.IsDeleted = true;
+            _dbSet.Attach(existing);
+            _dbContext.Entry(existing).State = EntityState.Modified;
+        }
+        else
             _dbSet.Remove(existing);
     }
 
@@ -238,7 +275,16 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     {
         IEnumerable<T> entities = _dbSet.Where(where).AsEnumerable();
         foreach (T entity in entities)
-            _dbSet.Remove(entity);
+        {
+            if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+            {
+                (entity as SoftDeletedBaseEntity)!.IsDeleted = true;
+                _dbSet.Attach(entity);
+                _dbContext.Entry(entity).State = EntityState.Modified;
+            }
+            else
+                _dbSet.Remove(entity);
+        }
     }
 
     /// <summary>
