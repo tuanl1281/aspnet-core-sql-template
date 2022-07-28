@@ -134,7 +134,7 @@ public class Startup
                     if (_.Context.Request.Path.StartsWithSegments("/files"))
                     {
                         _.Context.Response.Headers.Add("Cache-Control", "no-store");
-                        if (_.Context.User.Identity is { IsAuthenticated: false })
+                        if (_.Context?.User?.Identity != null && !_.Context.User.Identity.IsAuthenticated)
                         {
                             _.Context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                             _.Context.Response.ContentLength = 0;

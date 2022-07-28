@@ -2,14 +2,26 @@
 
 public class ServiceException: System.Exception
 {
-    public dynamic Errors { get; set; }
-        
+    public string Code { get; }
+
+    public dynamic Details { get; }
+    
+    public dynamic Data { get; }
+
     public ServiceException() : base() { }
 
-    public ServiceException(string message) : base(message) { }
+    public ServiceException(string code) : base() { }
+    
+    public ServiceException(string code, string message) : base(message) { }
 
-    public ServiceException(string message, dynamic errors) : base(message)
+    public ServiceException(string code, string message, dynamic details): base(message)
     {
-        Errors = errors;
+        Details = details;
+    }
+    
+    public ServiceException(string code, string message, dynamic details, dynamic data): base(message)
+    {
+        Details = details;
+        Data = data;
     }
 }

@@ -60,7 +60,7 @@ public static class StartupExtension
             {
                 document.Title = configuration["AppName"] ?? "API";
                 document.Description = $"{environmentOfSystem} | Build at {DateTime.Now.ToLocalTime():HH:mm dd/MM/yyyy}";
-                document.Version = configuration["Version"] ?? "6.0";
+                document.Version = configuration["AppVersion"] ?? "6.0";
 
                 document.DocumentName = description.GroupName;
                 document.PostProcess = _ => _.Info.Version = description.GroupName;

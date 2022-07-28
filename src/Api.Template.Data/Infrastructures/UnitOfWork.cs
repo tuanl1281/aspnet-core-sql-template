@@ -1,10 +1,8 @@
-﻿namespace Api.Template.Data.Infrastructures;
-
-using System;
-using System.Collections;
-using System.Threading.Tasks;
+﻿using System.Collections;
 using Microsoft.EntityFrameworkCore;
-using Repositories.Common;
+using Api.Template.Data.Repositories.Common;
+
+namespace Api.Template.Data.Infrastructures;
 
 public interface IUnitOfWork<TContext> where TContext : DbContext, IDisposable, new()
 {
@@ -46,7 +44,7 @@ public class UnitOfWork<TContext>: IUnitOfWork<TContext> where TContext : DbCont
                 .MakeGenericType(typeof (TEntity)), _dbFactory);
 
         _repositories.Add(type, repositoryInstance);
-
+        /* Return */
         return (IBaseRepository<TEntity, TContext>) _repositories[type];
     }
     

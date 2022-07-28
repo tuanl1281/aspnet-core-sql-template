@@ -2,21 +2,22 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     </PropertyGroup>
 
     <ItemGroup>
-          <PackageReference Include="AutoMapper" Version="11.0.1" />
-          <PackageReference Include="Hangfire" Version="1.7.28" />
-          <PackageReference Include="Hangfire.AspNetCore" Version="1.7.28" />
-          <PackageReference Include="Hangfire.Core" Version="1.7.28" />
-          <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
-          <PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
-          <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
-          <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
-          <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-          <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+        <PackageReference Include="AutoMapper" Version="11.0.1" />
+        <PackageReference Include="Hangfire" Version="1.7.28" />
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.7.28" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.28" />
+        <PackageReference Include="Hangfire.MemoryStorage" Version="1.7.0" />
+        <PackageReference Include="Hangfire.SqlServer" Version="1.7.28" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
@@ -36,13 +37,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Api.Template.Data\Api.Template.Data.csproj" />
-      <ProjectReference Include="..\Api.Template.Service\Api.Template.Service.csproj" />
-      <ProjectReference Include="..\Api.Template.ViewModel\Api.Template.ViewModel.csproj" />
+        <ProjectReference Include="..\Api.Template.Data\Api.Template.Data.csproj" />
+        <ProjectReference Include="..\Api.Template.Service\Api.Template.Service.csproj" />
+        <ProjectReference Include="..\Api.Template.ViewModel\Api.Template.ViewModel.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
+        <Folder Include="Controllers" />
     </ItemGroup>
-
 </Project>

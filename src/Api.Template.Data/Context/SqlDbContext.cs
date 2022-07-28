@@ -1,8 +1,6 @@
-﻿namespace Api.Template.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel.DataAnnotations.Schema;
+namespace Api.Template.Data.Context;
 
 public class SqlDbContext: DbContext
 {

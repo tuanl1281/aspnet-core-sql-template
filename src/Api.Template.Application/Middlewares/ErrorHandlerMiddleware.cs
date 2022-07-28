@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿// ReSharper disable InconsistentNaming
+// ReSharper disable TemplateIsNotCompileTimeConstantProblem
+using Serilog;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Api.Template.ViewModel.Common.Exception;
@@ -29,29 +31,22 @@ public class ErrorHandlerMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        object result; string messages;
-        
+        object result;
         switch (exception)
         {
             case ServiceException _exception:
                 {
                     context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                    if (_exception.Errors != null)
-                    {
-                        result = new ErrorResponseModel()
-                        {
-                            Succeed = false,
-                            Errors = _exception.Errors,
-                            Message = _exception.Message,
-                        };
-
-                        break;
-                    }
-                    
-                    result = new ResultResponseModel()
+                    result = new ErrorResponseModel()
                     {
                         Succeed = false,
-                        Message = _exception.Message,
+                        Error = new()
+                        {
+                            Code = _exception.Code,
+                            Message = _exception.Message,
+                            Details = _exception.Details
+                        },
+                        Data = _exception.Data
                     };
 
                     break;
@@ -59,28 +54,27 @@ public class ErrorHandlerMiddleware
             case NotFoundException _exception:
                 {
                     context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                    messages = _exception.Message;
                     result = new ResultResponseModel()
                     {
                         Succeed = false,
-                        Message = messages,
+                        Message = _exception.Message,
                     };
 
-                    Log.Error(messages);
+                    Log.Error(_exception.Message);
                     break;
                 }
             default:
                 {
+                    var builder = exception.Message + "\n" + (exception.InnerException != null ? exception.InnerException.Message : "") + "\n ***Trace*** \n" + exception.StackTrace;
                     context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                    messages = exception.Message + "\n" + (exception.InnerException != null ? exception.InnerException.Message : "") + "\n ***Trace*** \n" + exception.StackTrace;
-                    result = messages;
+                    result = builder;
                     
-                    Log.Error(messages);
+                    Log.Error(builder);
                     break;
                 }
         }
 
         context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(result.ToString());
+        await context.Response.WriteAsync(result.ToString() ?? string.Empty);
     }
 }

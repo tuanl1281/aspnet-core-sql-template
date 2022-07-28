@@ -3,19 +3,30 @@ using System.Text.Json.Serialization;
 
 namespace Api.Template.ViewModel.Common.Response;
 
-public class ErrorResponseModel
+public class Error
 {
-    [JsonProperty("succeed")]
-    [JsonPropertyName("succeed")]
-    public bool Succeed { get; set; } = false;
-
-    [JsonProperty("errors")]
-    [JsonPropertyName("errors")]
-    public dynamic Errors { get; set; }
+    [JsonProperty("code")]
+    [JsonPropertyName("code")]
+    public string Code { get; set; }
     
     [JsonProperty("message")]
     [JsonPropertyName("message")]
     public string Message { get; set; }
+    
+    [JsonProperty("details")]
+    [JsonPropertyName("details")]
+    public dynamic Details { get; set; }
+}
+
+public class ErrorResponseModel
+{
+    [JsonProperty("succeed")]
+    [JsonPropertyName("succeed")]
+    public bool Succeed { get; set; }
+
+    [JsonProperty("error")]
+    [JsonPropertyName("error")]
+    public Error Error { get; set; }
 
     [JsonProperty("data")]
     [JsonPropertyName("data")]
@@ -30,10 +41,10 @@ public class ErrorResponseModel
         Data = data;
     }
     
-    public ErrorResponseModel(dynamic data, dynamic errors)
+    public ErrorResponseModel(dynamic data, Error error)
     {
         Data = data;
-        Errors = errors;
+        Error = error;
     }
         
     public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this);
@@ -43,15 +54,11 @@ public class ErrorResponseModel<T>
 {
     [JsonProperty("succeed")]
     [JsonPropertyName("succeed")]
-    public bool Succeed { get; set; } = false;
+    public bool Succeed { get; set; }
     
-    [JsonProperty("errors")]
-    [JsonPropertyName("errors")]
-    public dynamic Errors { get; set; }
-    
-    [JsonProperty("message")]
-    [JsonPropertyName("message")]
-    public string Message { get; set; }
+    [JsonProperty("error")]
+    [JsonPropertyName("error")]
+    public Error Error { get; set; }
 
     [JsonProperty("data")]
     [JsonPropertyName("data")]
@@ -66,10 +73,10 @@ public class ErrorResponseModel<T>
         Data = data;
     }
     
-    public ErrorResponseModel(T data, dynamic errors)
+    public ErrorResponseModel(T data, Error error)
     {
         Data = data;
-        Errors = errors;
+        Error = error;
     }
         
     public override string ToString() => System.Text.Json.JsonSerializer.Serialize(this);
