@@ -1,7 +1,4 @@
-﻿namespace Api.Template.Application;
-
-using System.Net;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.SqlServer;
 using Hangfire.MemoryStorage;
@@ -13,9 +10,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Extensions;
-using Middlewares;
-using Data.Context;
+using System.Net;
+using Api.Template.Application.Extensions;
+using Api.Template.Application.Middlewares;
+using Api.Template.Data.Context;
+
+namespace Api.Template.Application;
 
 public class Startup
 {

@@ -38,10 +38,9 @@ public class UnitOfWork<TContext>: IUnitOfWork<TContext> where TContext : DbCont
         if (_repositories.ContainsKey(type))
             return (IBaseRepository<TEntity, TContext>) _repositories[type];
         /* Add instance */
-        var repositoryType = typeof(BaseRepository<TEntity, TContext>);
+        var repositoryType = typeof(BaseRepository<,>);
         var repositoryInstance =
-            Activator.CreateInstance(repositoryType
-                .MakeGenericType(typeof (TEntity)), _dbFactory);
+            Activator.CreateInstance(repositoryType.MakeGenericType(typeof (TEntity), typeof(TContext)), _dbFactory);
 
         _repositories.Add(type, repositoryInstance);
         /* Return */
