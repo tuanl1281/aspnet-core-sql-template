@@ -1,13 +1,13 @@
-﻿namespace Api.Template.Data.Infrastructures;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
+namespace Api.Template.Data.Infrastructures;
 
-public interface IDbFactory<out TContext> : IDisposable where TContext: DbContext, new()
+public interface IDbFactory<out TContext> where TContext : DbContext
 {
     TContext Init();
 }
 
-public class DbFactory<TContext> : Disposable, IDbFactory<TContext> where TContext: DbContext, new()
+public class DbFactory<TContext>: Disposable, IDbFactory<TContext> where TContext: DbContext, new()
 {
     private TContext? _dbContext;
 

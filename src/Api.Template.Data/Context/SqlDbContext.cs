@@ -1,10 +1,28 @@
-﻿using Api.Template.Data.Entities.Common;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Api.Template.Data.Entities.Common;
+using Api.Template.Data.Constants.Common;
 
 namespace Api.Template.Data.Context;
 
 public class SqlDbContext: DbContext
 {
+    private Guid TenantId
+    {
+        get
+        {
+            try
+            {
+                var value = new HttpContextAccessor().HttpContext.User.Claims.FirstOrDefault(c => c.Type.Equals(ClaimConstants.TenantId))?.Value;
+                return string.IsNullOrEmpty(value) ? Guid.Empty : Guid.Parse(value);
+            }
+            catch (Exception exception)
+            {
+                return Guid.Empty;
+            }
+        }
+    }
+    
     public SqlDbContext()
     {
     }
@@ -12,6 +30,11 @@ public class SqlDbContext: DbContext
     public SqlDbContext(DbContextOptions<SqlDbContext> options): base(options)
     {
     } 
+    
+    #region --- Filter ---
+    public void TenantFilter<T>(ModelBuilder modelBuilder) where T : class
+        =>  modelBuilder.Entity<T>().HasQueryFilter(_ => EF.Property<Guid>(_, "TenantId") == TenantId);
+    #endregion
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -21,6 +44,22 @@ public class SqlDbContext: DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Apply global filter for entity which has tenantId
+        if (TenantId != Guid.Empty)
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var prop = entityType.FindProperty("TenantId");
+                if (prop != null && prop.ClrType == typeof(int))
+                {
+                    GetType()
+                        .GetMethod(nameof(TenantFilter))
+                        .MakeGenericMethod(entityType.ClrType)
+                        .Invoke(this, new object[] { modelBuilder });
+                }
+            }
+        }
     }
     
     public override int SaveChanges()
@@ -32,18 +71,39 @@ public class SqlDbContext: DbContext
 
         foreach (var insertedEntry in insertedEntries)
         {
-            if (insertedEntry is BaseEntity auditableEntity)
-                auditableEntity.DateCreated = DateTime.Now;
+            /* Date Created */
+            if (insertedEntry is BaseEntity)
+                ((BaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            
+            if (insertedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            
+            if (insertedEntry is SoftDeletedBaseEntity)
+                ((SoftDeletedBaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            /* Tenant */
+            if (TenantId != Guid.Empty && insertedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) insertedEntry).TenantId = TenantId;
         }
-
+        
+        /* Update */
         var modifiedEntries = ChangeTracker.Entries()
             .Where(x => x.State == EntityState.Modified)
             .Select(x => x.Entity);
-        /* Update */
+        
         foreach (var modifiedEntry in modifiedEntries)
         {
-            if (modifiedEntry is BaseEntity auditableEntity)
-                auditableEntity.DateUpdated = DateTime.Now;
+            /* Date Created */
+            if (modifiedEntry is BaseEntity)
+                ((BaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            
+            if (modifiedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            
+            if (modifiedEntry is SoftDeletedBaseEntity)
+                ((SoftDeletedBaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            /* Tenant */
+            if (TenantId != Guid.Empty && modifiedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) modifiedEntry).TenantId = TenantId;
         }
 
         return base.SaveChanges();
@@ -58,18 +118,39 @@ public class SqlDbContext: DbContext
 
         foreach (var insertedEntry in insertedEntries)
         {
-            if (insertedEntry is BaseEntity auditableEntity)
-                auditableEntity.DateCreated = DateTime.Now;
+            /* Date Created */
+            if (insertedEntry is BaseEntity)
+                ((BaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            
+            if (insertedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            
+            if (insertedEntry is SoftDeletedBaseEntity)
+                ((SoftDeletedBaseEntity) insertedEntry).DateCreated = DateTime.Now;
+            /* Tenant */
+            if (TenantId != Guid.Empty && insertedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) insertedEntry).TenantId = TenantId;
         }
-
+        
+        /* Update */
         var modifiedEntries = ChangeTracker.Entries()
             .Where(x => x.State == EntityState.Modified)
             .Select(x => x.Entity);
-        /* Update */
+        
         foreach (var modifiedEntry in modifiedEntries)
         {
-            if (modifiedEntry is BaseEntity auditableEntity)
-                auditableEntity.DateUpdated = DateTime.Now;
+            /* Date Created */
+            if (modifiedEntry is BaseEntity)
+                ((BaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            
+            if (modifiedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            
+            if (modifiedEntry is SoftDeletedBaseEntity)
+                ((SoftDeletedBaseEntity) modifiedEntry).DateCreated = DateTime.Now;
+            /* Tenant */
+            if (TenantId != Guid.Empty && modifiedEntry is TenantBaseEntity)
+                ((TenantBaseEntity) modifiedEntry).TenantId = TenantId;
         }
 
         return base.SaveChangesAsync(cancellationToken);

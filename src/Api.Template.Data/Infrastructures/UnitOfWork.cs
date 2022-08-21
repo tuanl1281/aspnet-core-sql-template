@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using Api.Template.Data.Repositories.Common;
 
 namespace Api.Template.Data.Infrastructures;

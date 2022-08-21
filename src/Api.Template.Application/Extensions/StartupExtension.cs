@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using NSwag;
+﻿using NSwag;
 using NSwag.Generation.Processors.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -8,8 +7,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Api.Template.Data.Context;
 using Api.Template.Data.Infrastructures;
+using Api.Template.Data.Repositories.Common;
+using Api.Template.Service.MappingProfiles.Common;
 
 namespace Api.Template.Application.Extensions;
 
@@ -22,18 +22,16 @@ public static class StartupExtension
     public static void AddRepositories(this IServiceCollection services)
     {
         #region --- Common ---
-        services.AddTransient<IUnitOfWork<SqlDbContext>, UnitOfWork<SqlDbContext>>();
+        services.AddTransient(typeof(IDbFactory<>), typeof(DbFactory<>));
+        services.AddTransient(typeof(IUnitOfWork<>), typeof(UnitOfWork<>));
+        services.AddTransient(typeof(IBaseRepository<,>), typeof(BaseRepository<,>));
         #endregion
     }
 
-    public static void AddMappingProfile(this IServiceCollection services)
+    public static void AddMapper(this IServiceCollection services)
     {
         /* Config */
-        var profiles = new MapperConfiguration(
-            _ =>
-            {
-            }
-        );
+        var profiles = new AutoMapper.MapperConfiguration(_ => _.AddMaps(typeof(MappingProfiles)));
         /* Add service */
         services.AddSingleton(profiles.CreateMapper());
     }

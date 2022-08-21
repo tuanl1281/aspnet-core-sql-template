@@ -1,16 +1,11 @@
-﻿using Api.Template.Data.Entities.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using Api.Template.Data.Infrastructures;
+using Api.Template.Data.Entities.Common;
 
 namespace Api.Template.Data.Repositories.Common;
 
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Infrastructures;
-
-public interface IBaseRepository<T, out TContext> where T : class where TContext : DbContext, new()
+public interface IBaseRepository<TEntity, TContext> where TEntity : class where TContext : DbContext
 {
     IDbFactory<TContext> DbFactory { get; }
 
@@ -21,7 +16,7 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// Get all entities
     /// </summary>
     /// <returns></returns>
-    IEnumerable<T> GetAll(bool allowTracking = true);
+    IEnumerable<TEntity> GetAll(bool allowTracking = true);
 
     /// <summary>
     /// Get entities by lambda expression
@@ -29,7 +24,7 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    IEnumerable<T> GetMany(Expression<Func<T, bool>> predicate, bool allowTracking = true);
+    IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true);
 
     /// <summary>
     /// Get entity by id
@@ -37,7 +32,7 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="id"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    T? GetById(object id, bool allowTracking = true);
+    TEntity? GetById(object id, bool allowTracking = true);
 
     /// <summary>
     /// Get entity by lambda expression
@@ -45,25 +40,25 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    T? Get(Expression<Func<T, bool>> predicate, bool allowTracking = true);
+    TEntity? Get(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true);
 
     /// <summary>
     /// Add new entity
     /// </summary>
     /// <param name="entity"></param>
-    void Add(T entity);
+    void Add(TEntity entity);
 
     /// <summary>
     /// Update an entity
     /// </summary>
     /// <param name="entity"></param>
-    void Update(T entity);
+    void Update(TEntity entity);
 
     /// <summary>
     /// Delete an entity
     /// </summary>
     /// <param name="entity"></param>
-    void Delete(T entity);
+    void Delete(TEntity entity);
 
     /// <summary>
     /// Delete an entity by id
@@ -75,13 +70,13 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// Delete by expression
     /// </summary>
     /// <param name="where"></param>
-    void Delete(Expression<Func<T, bool>> where);
+    void Delete(Expression<Func<TEntity, bool>> where);
 
     /// <summary>
     /// Delete the entities
     /// </summary>
     /// <param name="entities"></param>
-    void DeleteRange(IEnumerable<T> entities);
+    void DeleteRange(IEnumerable<TEntity> entities);
     #endregion
 
     #region Async Methods
@@ -92,7 +87,7 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool allowTracking = true);
+    Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true);
 
     /// <summary>
     /// Get entity by id async
@@ -100,7 +95,7 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="id"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    Task<T?> GetByIdAsync(object id, bool allowTracking = true);
+    Task<TEntity?> GetByIdAsync(object id, bool allowTracking = true);
 
     /// <summary>
     /// Get entities lambda expression async
@@ -108,25 +103,25 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    Task<IEnumerable<T>> GetManyAsync(Expression<Func<T, bool>> predicate, bool allowTracking = true);
+    Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true);
 
     /// <summary>
     /// Get all entities async
     /// </summary>
     /// <returns></returns>
-    Task<List<T>> GetAllAsync(bool allowTracking = true);
+    Task<List<TEntity>> GetAllAsync(bool allowTracking = true);
 
     /// <summary>
     /// Add new entity async
     /// </summary>
     /// <param name="entity"></param>
-    void AddAsync(T entity);
+    void AddAsync(TEntity entity);
 
     /// <summary>
     /// Update an entity async
     /// </summary>
     /// <param name="entity"></param>
-    void UpdateAsync(T entity);
+    void UpdateAsync(TEntity entity);
 
     /// <summary>
     /// Delete an entity by id async
@@ -138,32 +133,32 @@ public interface IBaseRepository<T, out TContext> where T : class where TContext
     /// Delete by expression async
     /// </summary>
     /// <param name="where"></param>
-    void DeleteAsync(Expression<Func<T, bool>> where);
+    void DeleteAsync(Expression<Func<TEntity, bool>> where);
 
     /// <summary>
     /// Delete the entities async
     /// </summary>
     /// <param name="entities"></param>
-    void DeleteRangeAsync(IEnumerable<T> entities);
+    void DeleteRangeAsync(IEnumerable<TEntity> entities);
     #endregion
 }
 
-public abstract class BaseRepository<T, TContext> where T : class where TContext: DbContext, new()
+public class BaseRepository<TEntity, TContext>: Disposable, IBaseRepository<TEntity, TContext> where TEntity : class where TContext : DbContext
 {
     #region Properties
     private readonly IDbFactory<TContext> _dbFactory;
     private readonly TContext _dbContext;
-    private readonly DbSet<T> _dbSet;
+    private readonly DbSet<TEntity> _dbSet;
 
-    protected IDbFactory<TContext> DbFactory => _dbFactory;
-    protected TContext DbContext => _dbContext;
+    public IDbFactory<TContext> DbFactory => _dbFactory;
+    public TContext DbContext => _dbContext;
     #endregion
     
     protected BaseRepository(IDbFactory<TContext> dbFactory)
     {
         _dbFactory = dbFactory;
         _dbContext ??= _dbFactory.Init();
-        _dbSet = _dbContext.Set<T>();
+        _dbSet = _dbContext.Set<TEntity>();
     }
 
     /// <summary>
@@ -172,7 +167,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual T? Get(Expression<Func<T, bool>> predicate, bool allowTracking = true)
+    public virtual TEntity? Get(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true)
     {
         return _dbSet.FirstOrDefault(predicate);
     }
@@ -183,7 +178,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="id"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual T? GetById(object id, bool allowTracking = true)
+    public virtual TEntity? GetById(object id, bool allowTracking = true)
     {
         return _dbSet.Find(id);
     }
@@ -194,7 +189,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual IEnumerable<T> GetMany(Expression<Func<T, bool>> predicate, bool allowTracking = true)
+    public virtual IEnumerable<TEntity> GetMany(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true)
     {
         return _dbSet.Where(predicate).AsEnumerable();
     }
@@ -203,7 +198,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Get list of entities
     /// </summary>
     /// <returns></returns>
-    public virtual IEnumerable<T> GetAll(bool allowTracking = true)
+    public virtual IEnumerable<TEntity> GetAll(bool allowTracking = true)
     {
         return _dbSet.AsEnumerable();
     }
@@ -212,7 +207,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Add new entity
     /// </summary>
     /// <param name="entity"></param>
-    public virtual void Add(T entity)
+    public virtual void Add(TEntity entity)
     {
         _dbSet.Add(entity);
     }
@@ -221,7 +216,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Update an entity
     /// </summary>
     /// <param name="entity"></param>
-    public virtual void Update(T entity)
+    public virtual void Update(TEntity entity)
     {
         _dbContext.Entry(entity).State = EntityState.Detached;
         _dbSet.Update(entity);
@@ -231,13 +226,13 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Delete an entity
     /// </summary>
     /// <param name="entity"></param>
-    public virtual void Delete(T entity)
+    public virtual void Delete(TEntity entity)
     {
         var existing = _dbSet.Find(entity);
         if (existing == null)
             return;
         
-        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(TEntity)))
         {
             (existing as SoftDeletedBaseEntity)!.IsDeleted = true;
             _dbSet.Attach(existing);
@@ -257,7 +252,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
         if (existing == null)
             return;
         
-        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+        if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(TEntity)))
         {
             (existing as SoftDeletedBaseEntity)!.IsDeleted = true;
             _dbSet.Attach(existing);
@@ -271,12 +266,12 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Delete by expression
     /// </summary>
     /// <param name="where"></param>
-    public virtual void Delete(Expression<Func<T, bool>> where)
+    public virtual void Delete(Expression<Func<TEntity, bool>> where)
     {
-        IEnumerable<T> entities = _dbSet.Where(where).AsEnumerable();
-        foreach (T entity in entities)
+        IEnumerable<TEntity> entities = _dbSet.Where(where).AsEnumerable();
+        foreach (TEntity entity in entities)
         {
-            if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(T)))
+            if (typeof(SoftDeletedBaseEntity).IsAssignableFrom(typeof(TEntity)))
             {
                 (entity as SoftDeletedBaseEntity)!.IsDeleted = true;
                 _dbSet.Attach(entity);
@@ -291,7 +286,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Delete entities
     /// </summary>
     /// <param name="entities"></param>
-    public virtual void DeleteRange(IEnumerable<T> entities)
+    public virtual void DeleteRange(IEnumerable<TEntity> entities)
     {
         _dbSet.RemoveRange(entities);
     }
@@ -302,7 +297,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, bool allowTracking = true)
+    public virtual async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true)
     {
         if (allowTracking)
             return await _dbSet.FirstOrDefaultAsync(predicate);
@@ -316,7 +311,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="id"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual async Task<T?> GetByIdAsync(object id, bool allowTracking = true)
+    public virtual async Task<TEntity?> GetByIdAsync(object id, bool allowTracking = true)
     {
         return await _dbSet.FindAsync(id);
     }
@@ -327,7 +322,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="predicate"></param>
     /// <param name="allowTracking"></param>
     /// <returns></returns>
-    public virtual async Task<IEnumerable<T>> GetManyAsync(Expression<Func<T, bool>> predicate, bool allowTracking = true)
+    public virtual async Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>> predicate, bool allowTracking = true)
     {
         return await _dbSet.Where(predicate).ToListAsync();
     }
@@ -336,7 +331,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Get all entities async
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<List<T>> GetAllAsync(bool allowTracking = true)
+    public virtual async Task<List<TEntity>> GetAllAsync(bool allowTracking = true)
     {
         return await _dbSet.ToListAsync();
     }
@@ -345,7 +340,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Add new entity async
     /// </summary>
     /// <param name="entity"></param>
-    public virtual void AddAsync(T entity)
+    public virtual void AddAsync(TEntity entity)
     {
         _dbSet.AddAsync(entity);
     }
@@ -354,7 +349,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Update an entity async
     /// </summary>
     /// <param name="entity"></param>
-    public virtual void UpdateAsync(T entity)
+    public virtual void UpdateAsync(TEntity entity)
     {
         _dbContext.Entry(entity).State = EntityState.Modified;
         _dbSet.Attach(entity);
@@ -366,7 +361,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// <param name="id"></param>
     public virtual void DeleteAsync(object id)
     {
-        T? existing = _dbSet.Find(id);
+        TEntity? existing = _dbSet.Find(id);
         if (existing != null)
             _dbSet.Remove(existing);
     }
@@ -375,10 +370,10 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Delete by expression
     /// </summary>
     /// <param name="predicate"></param>
-    public virtual void DeleteAsync(Expression<Func<T, bool>> predicate)
+    public virtual void DeleteAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        IEnumerable<T> entities = _dbSet.Where(predicate).AsEnumerable();
-        foreach (T entity in entities)
+        IEnumerable<TEntity> entities = _dbSet.Where(predicate).AsEnumerable();
+        foreach (TEntity entity in entities)
             _dbSet.Remove(entity);
     }
 
@@ -386,7 +381,7 @@ public abstract class BaseRepository<T, TContext> where T : class where TContext
     /// Delete entities
     /// </summary>
     /// <param name="entities"></param>
-    public virtual void DeleteRangeAsync(IEnumerable<T> entities)
+    public virtual void DeleteRangeAsync(IEnumerable<TEntity> entities)
     {
         _dbSet.RemoveRange(entities);
     }

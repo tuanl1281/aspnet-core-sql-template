@@ -95,8 +95,8 @@ public class Startup
         services.AddJwt(Configuration["Jwt:Key"], Configuration["Jwt:Issuer"], Configuration["Jwt:Issuer"]);
         /* For Swagger */
         services.AddSwagger(Environment, Configuration);
-        /* For mapping */
-        services.AddMappingProfile();
+        /* For Mapper */
+        services.AddMapper();
         /* For Layer Pattern */
         services.AddRepositories();
         services.AddBusinessServices();
