@@ -154,7 +154,7 @@ public class BaseRepository<TEntity, TContext>: Disposable, IBaseRepository<TEnt
     public TContext DbContext => _dbContext;
     #endregion
     
-    protected BaseRepository(IDbFactory<TContext> dbFactory)
+    public BaseRepository(IDbFactory<TContext> dbFactory)
     {
         _dbFactory = dbFactory;
         _dbContext ??= _dbFactory.Init();

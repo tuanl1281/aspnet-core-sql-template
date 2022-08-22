@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Api.Template.Data.Entities.Common;
 using Api.Template.Data.Constants.Common;
 
@@ -23,10 +24,18 @@ public class SqlDbContext: DbContext
         }
     }
     
+    private readonly IConfiguration _configuration;
+    
     public SqlDbContext()
     {
     }
 
+    public SqlDbContext(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    
     public SqlDbContext(DbContextOptions<SqlDbContext> options): base(options)
     {
     } 
@@ -39,13 +48,15 @@ public class SqlDbContext: DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseLazyLoadingProxies();
+        optionsBuilder.UseSqlServer(_configuration["SqlDb:ConnectionString"]);
+        /* Base */
+        base.OnConfiguring(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         
-        // Apply global filter for entity which has tenantId
+        /* Apply global filter for entity which has tenantId */
         if (TenantId != Guid.Empty)
         {
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -60,6 +71,8 @@ public class SqlDbContext: DbContext
                 }
             }
         }
+        /* Base */
+        base.OnModelCreating(modelBuilder);
     }
     
     public override int SaveChanges()
